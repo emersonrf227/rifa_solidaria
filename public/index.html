@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+
+    <title>Rifa Solidária</title>
+
+    <style>
+      body {
+        margin: 0;
+        background: #111;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        font-family: Arial;
+      }
+
+      .container {
+        position: relative;
+        width: 800px;
+      }
+
+      .rifa {
+        width: 100%;
+        display: block;
+        border-radius: 20px;
+      }
+
+      .numero {
+        position: absolute;
+        border-radius: 50%;
+        cursor: pointer;
+        transition: 0.2s;
+        transform: translate(-50%, -50%);
+      }
+
+      .numero:hover {
+        background: rgba(255, 255, 255, 0.2);
+      }
+
+      .vendido {
+        background: rgba(255, 0, 0, 0.6);
+        border: 3px solid white;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <img src="rifa.png" class="rifa" />
+
+      <div id="numeros"></div>
+    </div>
+    <script>
+      const numerosDiv = document.getElementById("numeros");
+
+      const POSICOES = {
+        "00": [55, 735],
+        "01": [110, 735],
+        "02": [160, 735],
+        "03": [215, 735],
+        "04": [265, 735],
+        "05": [313, 735],
+        "06": [360, 735],
+        "07": [405, 735],
+        "08": [450, 735],
+        "09": [495, 735],
+
+        10: [55, 790],
+        11: [110, 790],
+        12: [160, 790],
+        13: [215, 790],
+        14: [265, 790],
+        15: [313, 790],
+        16: [360, 790],
+        17: [405, 790],
+        18: [450, 790],
+        19: [495, 790],
+
+        20: [55, 845],
+        21: [110, 845],
+        22: [160, 845],
+        23: [215, 845],
+        24: [265, 845],
+        25: [313, 845],
+        26: [360, 845],
+        27: [405, 845],
+        28: [450, 845],
+        29: [495, 845],
+
+        30: [55, 895],
+        31: [110, 895],
+        32: [160, 895],
+        33: [215, 895],
+        34: [265, 895],
+        35: [313, 895],
+        36: [360, 895],
+        37: [405, 895],
+        38: [450, 895],
+        39: [495, 895],
+        40: [55, 950],
+        41: [110, 950],
+        42: [160, 950],
+        43: [215, 950],
+        44: [265, 950],
+        45: [313, 950],
+        46: [360, 950],
+        47: [405, 950],
+        48: [450, 950],
+        49: [495, 950],
+      };
+
+      async function loadVendidos() {
+        const res = await fetch("/api/vendidos");
+        return await res.json();
+      }
+
+      async function toggle(numero, el) {
+        const vendido = el.classList.contains("vendido");
+
+        if (vendido) {
+          await fetch(`/api/desmarcar/${numero}`, {
+            method: "POST",
+          });
+
+          el.classList.remove("vendido");
+        } else {
+          await fetch(`/api/marcar/${numero}`, {
+            method: "POST",
+          });
+
+          el.classList.add("vendido");
+        }
+      }
+
+      async function init() {
+        const vendidos = await loadVendidos();
+
+        Object.entries(POSICOES).forEach(([numero, pos]) => {
+          const [x, y] = pos;
+
+          const div = document.createElement("div");
+
+          div.className = "numero";
+
+          div.style.left = `${x}px`;
+          div.style.top = `${y}px`;
+
+          div.style.width = "42px";
+          div.style.height = "42px";
+
+          if (vendidos.includes(numero)) {
+            div.classList.add("vendido");
+          }
+
+          div.onclick = () => toggle(numero, div);
+
+          numerosDiv.appendChild(div);
+        });
+      }
+
+      init();
+    </script>
+  </body>
+</html>
